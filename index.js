@@ -37,15 +37,13 @@ app.use((req, res, next) => {
 const authRoutes = require('./routes/authRoutes');
 const crearPostulanteRoute = require('./routes/crearPostulanteRoute');
 const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
-const entrevistadorRoutes = require('./routes/entrevistadorRoutes');
 const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
 const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
 // Usar las rutas
-app.use('/api/auth', authRoutes);
+app.use('/api/auth', authRoutes); // aquí está el registro y login de entrevistadores
 app.use('/api', crearPostulanteRoute);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
-app.use('/api/registrar', entrevistadorRoutes);
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
