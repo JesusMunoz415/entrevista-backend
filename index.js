@@ -13,10 +13,10 @@ app.use(express.json());
 
 // Conexión a la base de datos
 const db = mysql.createConnection({
-  host: process.env.DB_HOST,       // Por ejemplo: 'localhost' o 'caboose.proxy.rlwy.net'
-  user: process.env.DB_USER,       // Por ejemplo: 'root'
-  password: process.env.DB_PASS,   // Tu contraseña
-  database: process.env.DB_NAME    // Por ejemplo: 'railway'
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
 
 db.connect(err => {
@@ -35,11 +35,19 @@ app.use((req, res, next) => {
 
 // Rutas
 const authRoutes = require('./routes/authRoutes');
-// Agrega más rutas aquí como:
-// const postulanteRoutes = require('./routes/postulanteRoutes');
+const crearPostulanteRoute = require('./routes/crearPostulanteRoute');
+const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
+const entrevistadorRoutes = require('./routes/entrevistadorRoutes');
+const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
+const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
+// Usar las rutas
 app.use('/api/auth', authRoutes);
-// app.use('/api/postulantes', postulanteRoutes); // Ejemplo futuro
+app.use('/api', crearPostulanteRoute);
+app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
+app.use('/api/registrar', entrevistadorRoutes);
+app.use('/api/historial', historialEntrevistasRoutes);
+app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
 // Ruta raíz de prueba
 app.get('/', (req, res) => {
@@ -50,9 +58,3 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
 });
-
-const crearPostulanteRoute = require('./routes/crearPostulanteRoute');
-app.use('/api', crearPostulanteRoute);
-
-const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
-app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
