@@ -1,4 +1,4 @@
-// index.js
+// index.js de tu backend
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2');
@@ -7,9 +7,15 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
-app.use(cors());
+
+app.use(cors({
+    origin: 'https://entrevista-frontend.onrender.com',  // tu frontend en Render
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true
+}));
+
 app.use(express.json());
+
 
 // Conexión a la base de datos
 const db = mysql.createConnection({
