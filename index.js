@@ -17,43 +17,47 @@ app.use(express.json());
 
 // Conexión a la base de datos
 const db = mysql.createConnection({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME
 });
 
 db.connect(err => {
-    if (err) {
-        console.error('❌ Error al conectar a la base de datos:', err);
-    } else {
-        console.log('✅ Conectado a la base de datos MySQL');
-    }
+  if (err) {
+    console.error('❌ Error al conectar a la base de datos:', err);
+  } else {
+    console.log('✅ Conectado a la base de datos MySQL');
+  }
 });
 
+// Hacer accesible la conexión a DB desde req
 app.use((req, res, next) => {
-    req.db = db;
-    next();
+  req.db = db;
+  next();
 });
 
 // Rutas
 const authRoutes = require('./routes/authRoutes');
-const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes'); // 👈 FIX
+const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
 const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
 const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
 const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
 // Usar las rutas
 app.use('/api/auth', authRoutes);
-app.use('/api/postulantes', crearPostulanteRoutes); // 👈 FIX
+app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
+app.use('/api/respuestas', guardarRespuestaRoutes);  // alias para que el frontend funcione
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
+// Ruta raíz de prueba
 app.get('/', (req, res) => {
-    res.send('🎉 Backend funcionando correctamente');
+  res.send('🎉 Backend funcionando correctamente');
 });
 
+// Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
 });
