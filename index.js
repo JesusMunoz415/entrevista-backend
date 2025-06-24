@@ -45,8 +45,9 @@ const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
 // Usar las rutas
 app.use('/api/auth', authRoutes);
-app.use('/api/postulantes', crearPostulanteRoutes); // 👈 FIX
+app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
+app.use('/api/respuestas', guardarRespuestaRoutes);  // alias para que el frontend funcione
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
