@@ -50,6 +50,8 @@ app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
 app.use('/api/respuestas', guardarRespuestaRoutes);  // alias para que el frontend funcione
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
+app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
+app.use('/api/respuestas', guardarRespuestaRoutes);  // alias para compatibilidad con frontend
 
 app.get('/', (req, res) => {
     res.send('🎉 Backend funcionando correctamente');
