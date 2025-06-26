@@ -3,6 +3,8 @@ const obtenerHistorial = async (req, res) => {
     const { entrevistador_id } = req.body;
     const db = req.db;
 
+    console.log("📥 ID recibido:", entrevistador_id);
+
     const [rows] = await db.query(`
       SELECT 
         p.nombre AS postulante,
@@ -18,7 +20,8 @@ const obtenerHistorial = async (req, res) => {
       ORDER BY r.fecha DESC
     `, [entrevistador_id]);
 
-    // Agrupar por postulante + fecha
+    console.log("✅ Filas recuperadas:", rows.length);
+
     const entrevistas = [];
     const mapa = new Map();
 
@@ -43,9 +46,7 @@ const obtenerHistorial = async (req, res) => {
 
     res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
   } catch (err) {
-    console.error('❌ Error en historial:', err);
+    console.error('❌ Error en historial:', err.message);
     res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
   }
 };
-
-module.exports = { obtenerHistorial };
