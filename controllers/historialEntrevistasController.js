@@ -1,59 +1,51 @@
-const obtenerHistorial = (req, res) => {
-  const { entrevistador_id } = req.body;
+const obtenerHistorial = async (req, res) => {
+  try {
+    const { entrevistador_id } = req.body;
+    const db = req.db;
 
-  if (!entrevistador_id) {
-    return res.status(400).json({ status: 'error', mensaje: 'Falta el ID del entrevistador' });
-  }
+    const [rows] = await db.query(`
+      SELECT 
+        p.nombre AS postulante,
+        r.fecha,
+        r.pregunta_id,
+        r.texto AS respuesta,
+        r.evaluacion_automatica,
+        r.puntaje_manual,
+        r.comentario_manual
+      FROM respuestas r
+      JOIN postulantes p ON r.postulante_id = p.id
+      WHERE r.entrevistador_id = ?
+      ORDER BY r.fecha DESC
+    `, [entrevistador_id]);
 
-  const sql = `
-    SELECT 
-      r.id,
-      r.postulante_id,
-      p.nombre AS postulante,
-      r.fecha,
-      r.pregunta_id,
-      pr.texto AS pregunta,
-      r.texto AS respuesta,
-      r.evaluacion_automatica,
-      r.puntaje_manual,
-      r.comentario_manual
-    FROM respuestas r
-    JOIN postulantes p ON r.postulante_id = p.id
-    JOIN preguntas pr ON r.pregunta_id = pr.id
-    WHERE r.entrevistador_id = ?
-    ORDER BY r.fecha DESC
-  `;
+    // Agrupar por postulante + fecha
+    const entrevistas = [];
+    const mapa = new Map();
 
-  req.db.query(sql, [entrevistador_id], (err, resultados) => {
-    if (err) {
-      console.error('❌ Error al obtener historial:', err);
-      return res.status(500).json({ status: 'error', mensaje: 'Error al obtener historial' });
-    }
-
-    // Agrupar por fecha + postulante
-    const entrevistasMap = {};
-    resultados.forEach(row => {
-      const key = `${row.fecha}-${row.postulante_id}`;
-      if (!entrevistasMap[key]) {
-        entrevistasMap[key] = {
-          fecha: row.fecha,
+    for (const row of rows) {
+      const clave = `${row.postulante}_${row.fecha}`;
+      if (!mapa.has(clave)) {
+        mapa.set(clave, {
           postulante: row.postulante,
+          fecha: row.fecha,
           respuestas: []
-        };
+        });
       }
 
-      entrevistasMap[key].respuestas.push({
-        pregunta: row.pregunta,
+      mapa.get(clave).respuestas.push({
+        pregunta: `Pregunta ${row.pregunta_id}`,
         respuesta: row.respuesta,
         evaluacion_automatica: row.evaluacion_automatica,
         puntaje_manual: row.puntaje_manual,
         comentario_manual: row.comentario_manual
       });
-    });
+    }
 
-    const entrevistas = Object.values(entrevistasMap);
-    res.json({ status: 'ok', entrevistas });
-  });
+    res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
+  } catch (err) {
+    console.error('❌ Error en historial:', err);
+    res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
+  }
 };
 
 module.exports = { obtenerHistorial };
