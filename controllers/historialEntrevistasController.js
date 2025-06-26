@@ -1,4 +1,4 @@
-// controllers/historialEntrevistasController.js
+// backend/controllers/historialEntrevistasController.js
 
 const obtenerHistorial = async (req, res) => {
   try {
@@ -49,4 +49,7 @@ const obtenerHistorial = async (req, res) => {
   }
 };
 
-module.exports = { obtenerHistorial };
+module.exports = {
+  obtenerHistorial
+};
+

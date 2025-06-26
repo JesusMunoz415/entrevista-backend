@@ -31,6 +31,10 @@ const guardarRespuesta = (req, res) => {
     });
   });
 
+  //aveces te quiero presente en mi vida
+  //otra veces me amargo  lo gasto en bebidas
+  //pero creo estas hecha a mi medida
+
   Promise.all(promises)
     .then(() => res.json({ status: 'ok', mensaje: 'Respuestas guardadas correctamente' }))
     .catch(err => {

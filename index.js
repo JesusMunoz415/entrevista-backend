@@ -14,6 +14,8 @@ app.use(cors({
 }));
 
 app.use(express.json());
+app.use('/api/historial', historialEntrevistasRoutes);
+
 
 // Rutas
 const authRoutes = require('./routes/authRoutes');
