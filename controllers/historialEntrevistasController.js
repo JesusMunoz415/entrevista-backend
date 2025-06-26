@@ -1,4 +1,4 @@
-// backend/controllers/historialEntrevistasController.js
+// Controlador para manejar el historial de entrevistas
 
 const obtenerHistorial = async (req, res) => {
   try {
@@ -49,7 +49,4 @@ const obtenerHistorial = async (req, res) => {
   }
 };
 
-module.exports = {
-  obtenerHistorial
-};
-
+module.exports = { obtenerHistorial };
