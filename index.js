@@ -15,22 +15,18 @@ app.use(cors({
 
 app.use(express.json());
 
-// Conexión a la base de datos
-const db = mysql.createConnection({
+// ✅ Pool de conexiones
+const db = mysql.createPool({
     host: process.env.DB_HOST,
     user: process.env.DB_USER,
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
 });
 
-db.connect(err => {
-    if (err) {
-        console.error('❌ Error al conectar a la base de datos:', err);
-    } else {
-        console.log('✅ Conectado a la base de datos MySQL');
-    }
-});
-
+// Middleware para inyectar DB
 app.use((req, res, next) => {
     req.db = db;
     next();
@@ -38,7 +34,7 @@ app.use((req, res, next) => {
 
 // Rutas
 const authRoutes = require('./routes/authRoutes');
-const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes'); // 👈 FIX
+const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
 const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
 const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
 const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
@@ -47,15 +43,16 @@ const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
-app.use('/api/respuestas', guardarRespuestaRoutes);  // alias para que el frontend funcione
+app.use('/api/respuestas', guardarRespuestaRoutes);  // alias extra
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
-
+// Ruta raíz
 app.get('/', (req, res) => {
     res.send('🎉 Backend funcionando correctamente');
 });
 
+// Iniciar servidor
 app.listen(PORT, () => {
     console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
 });
