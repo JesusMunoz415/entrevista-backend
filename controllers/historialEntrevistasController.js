@@ -1,5 +1,3 @@
-// Controlador para manejar el historial de entrevistas
-
 const obtenerHistorial = async (req, res) => {
   try {
     const { entrevistador_id } = req.body;
