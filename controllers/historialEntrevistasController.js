@@ -1,9 +1,9 @@
+// controllers/historialEntrevistasController.js
+
 const obtenerHistorial = async (req, res) => {
   try {
     const { entrevistador_id } = req.body;
     const db = req.db;
-
-    console.log("📥 ID recibido:", entrevistador_id);
 
     const [rows] = await db.query(`
       SELECT 
@@ -19,8 +19,6 @@ const obtenerHistorial = async (req, res) => {
       WHERE r.entrevistador_id = ?
       ORDER BY r.fecha DESC
     `, [entrevistador_id]);
-
-    console.log("✅ Filas recuperadas:", rows.length);
 
     const entrevistas = [];
     const mapa = new Map();
@@ -46,7 +44,9 @@ const obtenerHistorial = async (req, res) => {
 
     res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
   } catch (err) {
-    console.error('❌ Error en historial:', err.message);
+    console.error('❌ Error en historial:', err);
     res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
   }
 };
+
+module.exports = { obtenerHistorial };
