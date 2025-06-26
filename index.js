@@ -1,7 +1,7 @@
 // index.js de tu backend
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 require('dotenv').config();
 
 const app = express();
@@ -15,19 +15,29 @@ app.use(cors({
 
 app.use(express.json());
 
-// ✅ Pool de conexiones
-const db = mysql.createPool({
-    host: process.env.DB_HOST,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASS,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+let db;
+(async () => {
+  try {
+    db = await mysql.createPool({
+      host: process.env.DB_HOST,
+      user: process.env.DB_USER,
+      password: process.env.DB_PASS,
+      database: process.env.DB_NAME,
+      waitForConnections: true,
+      connectionLimit: 10,
+      queueLimit: 0
+    });
+    console.log('✅ Pool de conexiones MySQL creado correctamente');
+  } catch (err) {
+    console.error('❌ Error al crear el pool de MySQL:', err);
+  }
+})();
 
 // Middleware para inyectar DB
 app.use((req, res, next) => {
+    if (!db) {
+        return res.status(500).json({ status: 'error', message: 'DB no inicializada' });
+    }
     req.db = db;
     next();
 });
