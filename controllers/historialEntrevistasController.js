@@ -1,16 +1,9 @@
 const obtenerHistorial = async (req, res) => {
   try {
     const { entrevistador_id } = req.body;
+    console.log("📥 ID recibido:", entrevistador_id);
+
     const db = req.db;
-
-    console.log('📥 Petición recibida para historial del entrevistador:', entrevistador_id);
-
-    if (!entrevistador_id) {
-      console.error('⚠️ Error: entrevistador_id no proporcionado');
-      return res.status(400).json({ status: 'error', mensaje: 'ID de entrevistador requerido' });
-    }
-
-    // Ejecutar consulta
     const [rows] = await db.query(`
       SELECT 
         p.nombre AS postulante,
@@ -26,14 +19,8 @@ const obtenerHistorial = async (req, res) => {
       ORDER BY r.fecha DESC
     `, [entrevistador_id]);
 
-    console.log(`📊 Se encontraron ${rows.length} registros en la consulta`);
+    console.log("📦 Resultados obtenidos:", rows);
 
-    if (rows.length === 0) {
-      console.warn('⚠️ No hay datos de entrevistas para este entrevistador');
-      return res.status(404).json({ status: 'vacio', mensaje: 'No hay entrevistas registradas' });
-    }
-
-    // Agrupar resultados
     const entrevistas = [];
     const mapa = new Map();
 
@@ -56,10 +43,9 @@ const obtenerHistorial = async (req, res) => {
       });
     }
 
-    console.log('✅ Historial procesado correctamente');
     res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
   } catch (err) {
-    console.error('❌ Error en historial (controlador):', err);
+    console.error('❌ Error en historial:', err.message);
     res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
   }
 };
