@@ -1,4 +1,3 @@
-// backend/db.js
 const mysql = require('mysql2/promise');
 
 const pool = mysql.createPool({
@@ -9,8 +8,11 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 60000,      // ⏱ 60 segundos para conectar
-  acquireTimeout: 60000       // ⏱ 60 segundos para adquirir conexión
+  connectTimeout: 60000,    // ⏱ 60 segundos para conectar
+  acquireTimeout: 60000,    // ⏱ 60 segundos para adquirir conexión
+  timeout: 60000            // ⏱ 60 segundos de timeout general
 });
+
+console.log('✅ Pool de conexiones MySQL inicializado con timeouts extendidos');
 
 module.exports = pool;
