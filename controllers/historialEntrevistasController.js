@@ -21,11 +21,10 @@ const obtenerHistorial = async (req, res) => {
     `, [entrevistador_id]);
 
     if (rows.length === 0) {
-      console.log('⚠️ No se encontraron entrevistas para el entrevistador.');
-      return res.json({ status: 'ok', entrevistas: [] });
+      console.warn('⚠️ No hay datos de entrevistas para este entrevistador.');
+      return res.status(404).json({ status: 'vacio', mensaje: 'No hay entrevistas registradas.' });
     }
 
-    // Agrupar por postulante y fecha
     const entrevistas = [];
     const mapa = new Map();
 
@@ -48,11 +47,28 @@ const obtenerHistorial = async (req, res) => {
       });
     }
 
-    console.log(`✅ Historial generado para el entrevistador ${entrevistador_id}`);
     res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
   } catch (err) {
     console.error('❌ Error en historial (controlador):', err);
-    res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
+
+    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
+      return res.status(503).json({
+        status: 'error',
+        mensaje: 'La conexión a la base de datos se perdió. Intenta nuevamente.'
+      });
+    }
+
+    if (err.code === 'ETIMEDOUT') {
+      return res.status(504).json({
+        status: 'error',
+        mensaje: 'Tiempo de espera agotado al consultar la base de datos.'
+      });
+    }
+
+    res.status(500).json({
+      status: 'error',
+      mensaje: 'Error inesperado al obtener historial.'
+    });
   }
 };
 
