@@ -1,4 +1,4 @@
-// index.js de tu backend
+// backend/index.js
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
@@ -7,41 +7,48 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configuración de CORS
+// CORS
 app.use(cors({
-    origin: 'https://entrevista-frontend.onrender.com', // Cambia a tu frontend
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+  origin: 'https://entrevista-frontend.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 
 app.use(express.json());
 
-// Pool de conexiones MySQL
-let pool;
+// Configuración avanzada del pool MySQL
+const dbConfig = {
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASS,
+  database: process.env.DB_NAME,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0,
+  connectTimeout: 60000,      // ⏱️ 60 segundos para conectar
+  acquireTimeout: 60000,      // ⏱️ 60 segundos para adquirir conexión
+  enableKeepAlive: true,      // 🔥 Mantener viva la conexión
+  keepAliveInitialDelay: 0    // 🔥 Sin retraso inicial
+};
+
+let db;
+
 (async () => {
-    try {
-        pool = mysql.createPool({
-            host: process.env.DB_HOST,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASS,
-            database: process.env.DB_NAME,
-            waitForConnections: true,
-            connectionLimit: 10,
-            queueLimit: 0
-        });
-        console.log('✅ Pool de conexiones MySQL creado correctamente');
-    } catch (err) {
-        console.error('❌ Error al crear el pool de MySQL:', err);
-    }
+  try {
+    db = await mysql.createPool(dbConfig);
+    console.log('✅ Pool de conexiones MySQL inicializado correctamente');
+  } catch (err) {
+    console.error('❌ Error al inicializar el pool de MySQL:', err);
+  }
 })();
 
-// Middleware para inyectar pool
+// Middleware para inyectar el pool
 app.use((req, res, next) => {
-    if (!pool) {
-        return res.status(500).json({ status: 'error', message: 'DB no inicializada' });
-    }
-    req.db = pool;
-    next();
+  if (!db) {
+    return res.status(500).json({ status: 'error', mensaje: 'DB no inicializada' });
+  }
+  req.db = db;
+  next();
 });
 
 // Importar rutas
@@ -55,16 +62,15 @@ const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 app.use('/api/auth', authRoutes);
 app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
-app.use('/api/respuestas', guardarRespuestaRoutes); // Alias extra
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
-    res.send('🎉 Backend funcionando correctamente');
+  res.send('🎉 Backend funcionando correctamente');
 });
 
 // Iniciar servidor
 app.listen(PORT, () => {
-    console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
 });

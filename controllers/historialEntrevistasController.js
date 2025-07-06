@@ -1,9 +1,10 @@
+// controllers/historialEntrevistasController.js
 const obtenerHistorial = async (req, res) => {
   try {
     const { entrevistador_id } = req.body;
-    const db = req.db;
-
     console.log(`📥 Petición recibida para historial del entrevistador: ${entrevistador_id}`);
+
+    const db = req.db;
 
     const [rows] = await db.query(`
       SELECT 
@@ -19,11 +20,6 @@ const obtenerHistorial = async (req, res) => {
       WHERE r.entrevistador_id = ?
       ORDER BY r.fecha DESC
     `, [entrevistador_id]);
-
-    if (rows.length === 0) {
-      console.warn('⚠️ No hay datos de entrevistas para este entrevistador.');
-      return res.status(404).json({ status: 'vacio', mensaje: 'No hay entrevistas registradas.' });
-    }
 
     const entrevistas = [];
     const mapa = new Map();
@@ -50,25 +46,7 @@ const obtenerHistorial = async (req, res) => {
     res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
   } catch (err) {
     console.error('❌ Error en historial (controlador):', err);
-
-    if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-      return res.status(503).json({
-        status: 'error',
-        mensaje: 'La conexión a la base de datos se perdió. Intenta nuevamente.'
-      });
-    }
-
-    if (err.code === 'ETIMEDOUT') {
-      return res.status(504).json({
-        status: 'error',
-        mensaje: 'Tiempo de espera agotado al consultar la base de datos.'
-      });
-    }
-
-    res.status(500).json({
-      status: 'error',
-      mensaje: 'Error inesperado al obtener historial.'
-    });
+    res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
   }
 };
 
