@@ -1,12 +1,23 @@
-// controllers/historialEntrevistasController.js
 const obtenerHistorial = async (req, res) => {
+  const { entrevistador_id } = req.body;
+  const db = req.db;
+
   try {
-    const { entrevistador_id } = req.body;
-    console.log(`📥 Petición recibida para historial del entrevistador: ${entrevistador_id}`);
+    console.log('📥 Petición recibida para historial del entrevistador:', entrevistador_id);
 
-    const db = req.db;
+    // Consulta los IDs únicos de los postulantes entrevistados por este entrevistador
+    const [postulantes] = await db.query(
+      'SELECT DISTINCT postulante_id FROM respuestas WHERE entrevistador_id = ?',
+      [entrevistador_id]
+    );
 
-    const [rows] = await db.query(`
+    if (postulantes.length === 0) {
+      return res.json({ status: 'ok', entrevistas: [] });
+    }
+
+    // Obtiene todos los detalles de las respuestas en una segunda consulta
+    const [rows] = await db.query(
+      `
       SELECT 
         p.nombre AS postulante,
         r.fecha,
@@ -19,7 +30,9 @@ const obtenerHistorial = async (req, res) => {
       JOIN postulantes p ON r.postulante_id = p.id
       WHERE r.entrevistador_id = ?
       ORDER BY r.fecha DESC
-    `, [entrevistador_id]);
+      `,
+      [entrevistador_id]
+    );
 
     const entrevistas = [];
     const mapa = new Map();
@@ -33,7 +46,6 @@ const obtenerHistorial = async (req, res) => {
           respuestas: []
         });
       }
-
       mapa.get(clave).respuestas.push({
         pregunta: `Pregunta ${row.pregunta_id}`,
         respuesta: row.respuesta,
@@ -46,7 +58,10 @@ const obtenerHistorial = async (req, res) => {
     res.json({ status: 'ok', entrevistas: Array.from(mapa.values()) });
   } catch (err) {
     console.error('❌ Error en historial (controlador):', err);
-    res.status(500).json({ status: 'error', mensaje: 'Fallo en historial' });
+    if (err.code === 'PROTOCOL_CONNECTION_LOST' || err.code === 'ETIMEDOUT') {
+      return res.status(500).json({ status: 'error', mensaje: 'Conexión a base de datos perdida o lenta.' });
+    }
+    res.status(500).json({ status: 'error', mensaje: 'Fallo en historial.' });
   }
 };
 
