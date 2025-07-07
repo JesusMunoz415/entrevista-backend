@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./db'); // importa el pool PostgreSQL desde db.js
+const db = require('./db'); // PostgreSQL pool
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,26 +24,27 @@ app.use((req, res, next) => {
   next();
 });
 
-// Importar rutas
+// Importar solo las rutas que sabemos están listas
 const authRoutes = require('./routes/authRoutes');
 const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
 const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
-const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
-const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
+// ⚠️ Temporalmente comentamos las que podrían estar vacías
+// const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
+// const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
-// Usar rutas
+// Usar rutas activas
 app.use('/api/auth', authRoutes);
 app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
-app.use('/api/historial', historialEntrevistasRoutes);
-app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
+// app.use('/api/historial', historialEntrevistasRoutes);
+// app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
   res.send('🎉 Backend funcionando correctamente con Supabase');
 });
 
-// Endpoint de prueba para conexión a DB
+// Endpoint de prueba para conexión DB
 app.get('/api/ping', async (req, res) => {
   try {
     const result = await db.query('SELECT NOW()');
