@@ -1,4 +1,3 @@
-// backend/index.js
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
@@ -26,7 +25,6 @@ const dbConfig = {
   connectionLimit: 10,
   queueLimit: 0,
   connectTimeout: 60000,      // ⏱️ 60 segundos para conectar
-  acquireTimeout: 60000,      // ⏱️ 60 segundos para adquirir conexión
   enableKeepAlive: true,      // 🔥 Mantener viva la conexión
   keepAliveInitialDelay: 0    // 🔥 Sin retraso inicial
 };
