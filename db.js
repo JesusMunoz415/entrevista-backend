@@ -8,30 +8,28 @@ const pool = mysql.createPool({
   waitForConnections: true,
   connectionLimit: 10,
   queueLimit: 0,
-  connectTimeout: 60000,    // ⏱ 60 segundos para conectar
-  acquireTimeout: 60000,    // ⏱ 60 segundos para adquirir conexión
-  timeout: 60000            // ⏱ 60 segundos de timeout general
+  connectTimeout: 60000 // ✅ único timeout válido en mysql2/promise
 });
 
-console.log('✅ Pool de conexiones MySQL inicializado con timeouts extendidos');
+console.log('✅ Pool de conexiones MySQL inicializado correctamente');
 
-// ⏳ Keep-Alive: consulta trivial cada 5 minutos para evitar que Railway duerma la DB
+// ⏳ Keep-Alive: consulta trivial cada 5 minutos para mantener Railway despierto
 setInterval(async () => {
   try {
     const conn = await pool.getConnection();
-    await conn.query('SELECT 1'); // Ping trivial
+    await conn.query('SELECT 1');
     conn.release();
     console.log('🔄 Keep-Alive: DB despierta');
   } catch (err) {
     console.error('⚠️ Error en Keep-Alive DB:', err.code);
   }
-}, 300000); // 5 minutos = 300000 ms
+});
 
-// 🛡️ Manejador de errores global del pool
+// 🛡️ Manejo global de errores del pool
 pool.on('error', (err) => {
-  console.error('❌ MySQL Pool Error:', err.code);
+  console.error('❌ Error del pool MySQL:', err.code);
   if (err.code === 'PROTOCOL_CONNECTION_LOST') {
-    console.log('♻️ Intentando reconexión a la DB...');
+    console.log('♻️ Conexión a la DB perdida. Intentando reconectar...');
   } else {
     throw err;
   }
