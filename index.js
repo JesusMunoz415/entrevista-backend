@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require('mysql2/promise');
 require('dotenv').config();
+const db = require('./db'); // importa el pool PostgreSQL desde db.js
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -14,31 +14,6 @@ app.use(cors({
 }));
 
 app.use(express.json());
-
-// Configuración avanzada del pool MySQL
-const dbConfig = {
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-  connectTimeout: 60000,      // ⏱️ 60 segundos para conectar
-  enableKeepAlive: true,      // 🔥 Mantener viva la conexión
-  keepAliveInitialDelay: 0    // 🔥 Sin retraso inicial
-};
-
-let db;
-
-(async () => {
-  try {
-    db = await mysql.createPool(dbConfig);
-    console.log('✅ Pool de conexiones MySQL inicializado correctamente');
-  } catch (err) {
-    console.error('❌ Error al inicializar el pool de MySQL:', err);
-  }
-})();
 
 // Middleware para inyectar el pool
 app.use((req, res, next) => {
@@ -65,7 +40,18 @@ app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
-  res.send('🎉 Backend funcionando correctamente');
+  res.send('🎉 Backend funcionando correctamente con Supabase');
+});
+
+// Endpoint de prueba para conexión a DB
+app.get('/api/ping', async (req, res) => {
+  try {
+    const result = await db.query('SELECT NOW()');
+    res.json({ status: 'ok', time: result.rows[0].now });
+  } catch (err) {
+    console.error('❌ Error al hacer ping a la DB:', err);
+    res.status(500).json({ status: 'error', mensaje: 'No se pudo conectar a la DB' });
+  }
 });
 
 // Iniciar servidor
