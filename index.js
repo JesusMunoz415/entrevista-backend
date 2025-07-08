@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./db'); // PostgreSQL pool
+const db = require('./db'); // conexión PostgreSQL
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -24,20 +24,19 @@ app.use((req, res, next) => {
   next();
 });
 
-// Importar solo las rutas que sabemos están listas
+// Importar rutas
 const authRoutes = require('./routes/authRoutes');
 const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
 const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
-// ⚠️ Temporalmente comentamos las que podrían estar vacías
-// const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
-// const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
+const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
+const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
-// Usar rutas activas
+// Usar rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
-// app.use('/api/historial', historialEntrevistasRoutes);
-// app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
+app.use('/api/historial', historialEntrevistasRoutes);
+app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
