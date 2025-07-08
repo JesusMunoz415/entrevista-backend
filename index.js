@@ -1,64 +1,49 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./db'); // ✅ Conexión Supabase/PostgreSQL
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ CORS configurado
+// ✅ CORS abierto para pruebas
 app.use(cors({
-  origin: [
-    'https://entrevista-frontend.onrender.com',
-    'http://localhost:3000' // para pruebas locales
-  ],
+  origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-// 🔥 Manejo de preflight OPTIONS
 app.options('*', cors());
 
 app.use(express.json());
 
-// 🛠 Middleware para inyectar la conexión DB
-app.use((req, res, next) => {
-  req.db = db;
-  next();
-});
+// 🔥 Middleware de prueba para DB eliminado (no lo necesitamos aquí)
 
-// 📦 Importar rutas
-const authRoutes = require('./routes/authRoutes');
-const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
-const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
-const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
-const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
+// 📦 Importar rutas (comentadas para pruebas)
+// const authRoutes = require('./routes/authRoutes');
+// const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
+// const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
+// const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
+// const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
-// 📌 Usar rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/postulantes', crearPostulanteRoutes);
-app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
-app.use('/api/historial', historialEntrevistasRoutes);
-app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
+// 🛣️ Usar rutas (comentadas)
+// app.use('/api/auth', authRoutes);
+// app.use('/api/postulantes', crearPostulanteRoutes);
+// app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
+// app.use('/api/historial', historialEntrevistasRoutes);
+// app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
-// ✅ Ruta raíz
+// 🌐 Ruta raíz
 app.get('/', (req, res) => {
-  res.send('🎉 Backend corriendo con Supabase y CORS configurado');
+  res.send('🎉 Backend funcionando (sin rutas activas)');
 });
 
-// ❌ Middleware para rutas no encontradas
+// ❌ 404 para rutas no encontradas
 app.use((req, res) => {
-  res.status(404).json({ status: 'error', mensaje: 'Ruta no encontrada' });
-});
-
-// 💣 Middleware global de errores
-app.use((err, req, res, next) => {
-  console.error('🔥 Error interno:', err);
-  res.status(500).json({ status: 'error', mensaje: 'Error interno del servidor' });
+  res.status(404).json({ status: 'error', mensaje: 'Ruta no encontrada (sin rutas activas)' });
 });
 
 // 🚀 Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Backend corriendo en http://localhost:${PORT} (sin rutas activas)`);
 });
