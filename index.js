@@ -5,19 +5,13 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ CORS configurado (solo para tu frontend en Render y localhost para desarrollo)
+// 🔥 Configuración CORS (solo tu frontend)
 app.use(cors({
-  origin: [
-    'https://entrevista-frontend.onrender.com', // 🌐 frontend en Render
-    'http://localhost:3000'                     // 🖥️ frontend local
-  ],
+  origin: 'https://entrevista-frontend.onrender.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
-
-// 🔥 Manejo de preflight OPTIONS
-app.options('*', cors());
 
 app.use(express.json());
 
@@ -28,30 +22,19 @@ const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
 const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
 const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
-// 🛣️ Usar rutas
+// 📂 Usar rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/postulantes', crearPostulanteRoutes);
 app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
 app.use('/api/historial', historialEntrevistasRoutes);
 app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
-// 🌐 Ruta raíz
+// 🌱 Ruta raíz
 app.get('/', (req, res) => {
-  res.send('🎉 Backend funcionando con Supabase y todas las rutas activas');
-});
-
-// ❌ 404 para rutas no encontradas
-app.use((req, res) => {
-  res.status(404).json({ status: 'error', mensaje: 'Ruta no encontrada' });
-});
-
-// 💣 Middleware global de errores
-app.use((err, req, res, next) => {
-  console.error('🔥 Error interno:', err);
-  res.status(500).json({ status: 'error', mensaje: 'Error interno del servidor' });
+  res.send('🎉 Backend funcionando correctamente con Supabase (Transaction Pooler)');
 });
 
 // 🚀 Iniciar servidor
 app.listen(PORT, () => {
-  console.log(`🚀 Backend corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor backend corriendo en http://localhost:${PORT}`);
 });
