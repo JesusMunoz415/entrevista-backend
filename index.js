@@ -1,28 +1,22 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const db = require('./db'); // conexión PostgreSQL
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS
+// ✅ CORS ajustado (permite todo para pruebas)
 app.use(cors({
-  origin: 'https://entrevista-frontend.onrender.com',
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  origin: true,  // 🔥 permite cualquier origen temporalmente
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
   credentials: true
 }));
 
-app.use(express.json());
+// 🔥 Responder a preflight OPTIONS
+app.options('*', cors());
 
-// Middleware para inyectar el pool
-app.use((req, res, next) => {
-  if (!db) {
-    return res.status(500).json({ status: 'error', mensaje: 'DB no inicializada' });
-  }
-  req.db = db;
-  next();
-});
+app.use(express.json());
 
 // Importar rutas
 const authRoutes = require('./routes/authRoutes');
@@ -40,18 +34,7 @@ app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
 
 // Ruta raíz
 app.get('/', (req, res) => {
-  res.send('🎉 Backend funcionando correctamente con Supabase');
-});
-
-// Endpoint de prueba para conexión DB
-app.get('/api/ping', async (req, res) => {
-  try {
-    const result = await db.query('SELECT NOW()');
-    res.json({ status: 'ok', time: result.rows[0].now });
-  } catch (err) {
-    console.error('❌ Error al hacer ping a la DB:', err);
-    res.status(500).json({ status: 'error', mensaje: 'No se pudo conectar a la DB' });
-  }
+  res.send('🎉 Backend funcionando correctamente con Supabase y CORS abierto');
 });
 
 // Iniciar servidor
