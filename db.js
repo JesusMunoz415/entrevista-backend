@@ -1,13 +1,15 @@
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
+  host: 'db.yntqvycarvwchtplnwex.supabase.co',
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
   database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
-  ssl: { rejectUnauthorized: false }
+  port: 6543, // 👈 Transaction Pooler
+  ssl: {
+    rejectUnauthorized: false
+  }
 });
 
-console.log('✅ Conectado a Supabase (Transaction Pooler)');
+console.log('✅ Conexión a Supabase (Transaction Pooler) establecida');
 module.exports = pool;
