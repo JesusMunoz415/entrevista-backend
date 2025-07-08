@@ -1,6 +1,7 @@
+// backend/controllers/eliminarEntrevistaController.js
 const db = require('../db');
 
-const eliminarEntrevista = (req, res) => {
+const eliminarEntrevista = async (req, res) => {
   const { postulante_id, fecha } = req.body;
 
   if (!postulante_id || !fecha) {
@@ -9,21 +10,21 @@ const eliminarEntrevista = (req, res) => {
 
   const query = `
     DELETE FROM respuestas 
-    WHERE postulante_id = ? AND DATE(fecha) = DATE(?)
+    WHERE postulante_id = $1 AND DATE(fecha_respuesta) = DATE($2)
   `;
 
-  db.query(query, [postulante_id, fecha], (err, resultado) => {
-    if (err) {
-      console.error('Error al eliminar entrevista:', err);
-      return res.status(500).json({ status: 'error', mensaje: 'Error en el servidor' });
-    }
+  try {
+    const result = await db.query(query, [postulante_id, fecha]);
 
-    if (resultado.affectedRows > 0) {
+    if (result.rowCount > 0) {
       res.json({ status: 'ok', mensaje: 'Entrevista eliminada correctamente' });
     } else {
       res.json({ status: 'ok', mensaje: 'No se encontró la entrevista' });
     }
-  });
+  } catch (err) {
+    console.error('❌ Error al eliminar entrevista:', err);
+    res.status(500).json({ status: 'error', mensaje: 'Error en el servidor' });
+  }
 };
 
 module.exports = { eliminarEntrevista };
