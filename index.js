@@ -5,9 +5,9 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// CORS abierto para pruebas
+// ✅ CORS configurado para frontend en Render
 app.use(cors({
-  origin: '*', // Puedes restringir a tu frontend: https://entrevista-frontend.onrender.com
+  origin: 'https://entrevista-frontend.onrender.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
 }));
