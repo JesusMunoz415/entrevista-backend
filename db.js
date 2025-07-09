@@ -1,19 +1,19 @@
 const { Pool } = require('pg');
-require('dotenv').config();
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  port: process.env.DB_PORT,
+  host: process.env.DB_HOST,           // crossover.proxy.rlwy.net
+  user: process.env.DB_USER,           // postgres
+  password: process.env.DB_PASS,       // tu password Railway
+  database: process.env.DB_NAME,       // railway
+  port: process.env.DB_PORT,           // 47056
   ssl: {
-    rejectUnauthorized: false
+    rejectUnauthorized: false          // ✅ para conexión segura
   }
 });
 
-pool.connect()
-  .then(() => console.log('✅ Conexión a Railway PostgreSQL exitosa'))
-  .catch(err => console.error('❌ Error al conectar a PostgreSQL:', err));
+// 🔥 Forzar uso del esquema público al conectarse
+pool.query('SET search_path TO public')
+  .then(() => console.log('🎯 Conectado a PostgreSQL y usando schema public'))
+  .catch(err => console.error('❌ Error al establecer schema public:', err));
 
 module.exports = pool;
