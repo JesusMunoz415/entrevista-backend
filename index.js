@@ -1,3 +1,4 @@
+// backend/index.js
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
@@ -5,11 +6,12 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ CORS abierto para tu frontend en Render
+// ✅ Configuración CORS para frontend en Render
 app.use(cors({
-  origin: ['https://entrevista-frontend.onrender.com'],
+  origin: 'https://entrevista-frontend.onrender.com', // 👈 Solo tu frontend
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true // 👈 Permitir cookies/sesiones
 }));
 
 app.use(express.json());
