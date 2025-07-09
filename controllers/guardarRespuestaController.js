@@ -1,37 +1,27 @@
-// controllers/guardarRespuestaController.js
+// backend/controllers/guardarRespuestaController.js
 const db = require('../db');
 
-const guardarRespuesta = async (req, res) => {
-  const { postulante_id, entrevistador_id, respuestas } = req.body;
+const guardarRespuestas = async (req, res) => {
+  const { entrevista_id, respuestas } = req.body;
 
-  if (!postulante_id || !entrevistador_id || !Array.isArray(respuestas)) {
-    return res.status(400).json({ status: 'error', mensaje: 'Datos inválidos' });
+  if (!entrevista_id || !respuestas || !Array.isArray(respuestas)) {
+    return res.status(400).json({ mensaje: 'Datos incompletos para guardar respuestas' });
   }
 
-  const query = `
-    INSERT INTO respuestas 
-    (postulante_id, entrevistador_id, pregunta_id, texto, evaluacion_automatica, puntaje_manual, comentario_manual) 
-    VALUES ($1, $2, $3, $4, $5, $6, $7)
-  `;
-
   try {
-    for (const resp of respuestas) {
-      await db.query(query, [
-        postulante_id,
-        entrevistador_id,
-        resp.pregunta_id,
-        resp.texto,
-        resp.evaluacion_automatica,
-        resp.puntaje_manual,
-        resp.comentario_manual || null
-      ]);
+    for (const r of respuestas) {
+      await db.query(
+        'INSERT INTO respuestas (entrevista_id, pregunta_id, respuesta, puntuacion) VALUES ($1, $2, $3, $4)',
+        [entrevista_id, r.pregunta_id, r.respuesta, r.puntuacion]
+      );
     }
 
-    res.json({ status: 'ok', mensaje: 'Respuestas guardadas correctamente' });
+    console.log('✅ Respuestas guardadas correctamente');
+    res.status(201).json({ mensaje: 'Respuestas guardadas' });
   } catch (err) {
     console.error('❌ Error al guardar respuestas:', err);
-    res.status(500).json({ status: 'error', mensaje: 'Error al guardar las respuestas' });
+    res.status(500).json({ mensaje: 'Error en el servidor al guardar respuestas' });
   }
 };
 
-module.exports = { guardarRespuesta };
+module.exports = { guardarRespuestas };

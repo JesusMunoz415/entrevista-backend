@@ -1,8 +1,9 @@
+// backend/routes/guardarRespuestaRoutes.js
 const express = require('express');
 const router = express.Router();
-const { guardarRespuesta } = require('../controllers/guardarRespuestaController');
+const guardarRespuestaController = require('../controllers/guardarRespuestaController');
 
-// POST /api/guardar-respuesta
-router.post('/', guardarRespuesta);
+// Ruta para guardar respuestas
+router.post('/', guardarRespuestaController.guardarRespuestas);
 
 module.exports = router;
