@@ -1,22 +1,14 @@
-// db.js
 const { Pool } = require('pg');
 
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASS,
-  database: process.env.DB_NAME,
-  ssl: {
-    rejectUnauthorized: false, // ✅ necesario para Railway/Render
-  },
+  host: process.env.DB_HOST,       // crossover.proxy.rlwy.net
+  port: process.env.DB_PORT,       // 47056
+  user: process.env.DB_USER,       // postgres
+  password: process.env.DB_PASS,   // tu contraseña
+  database: process.env.DB_NAME,   // railway
+  ssl: { rejectUnauthorized: false } // ✅ necesario para Render
 });
 
-pool.on('connect', () => {
-  console.log('✅ Conexión a Railway PostgreSQL establecida');
-});
-
-// 🔥 Forzar uso del esquema public
-pool.query('SET search_path TO public');
+console.log('✅ Conexión a Railway PostgreSQL establecida');
 
 module.exports = pool;
