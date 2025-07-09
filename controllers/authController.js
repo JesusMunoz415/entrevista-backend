@@ -1,6 +1,6 @@
 // controllers/authController.js
 const bcrypt = require('bcrypt');
-const db = require('../db'); // ✅ conexión a pg (Supabase)
+const db = require('../db'); // conexión a pg
 
 const register = async (req, res) => {
   const { nombre, email, password } = req.body;
@@ -10,9 +10,9 @@ const register = async (req, res) => {
   }
 
   try {
-    // 🔍 Verificar si el correo ya existe
+    // Verificar si el correo ya existe
     const result = await db.query(
-      'SELECT id FROM entrevistadores WHERE email = $1',
+      'SELECT id FROM entrevistadores WHERE correo = $1',
       [email]
     );
 
@@ -20,12 +20,12 @@ const register = async (req, res) => {
       return res.status(409).json({ mensaje: 'El correo ya está registrado' });
     }
 
-    // 🔐 Encriptar contraseña
+    // Encriptar contraseña
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 💾 Insertar nuevo entrevistador
+    // Insertar nuevo entrevistador
     await db.query(
-      'INSERT INTO entrevistadores (nombre, email, password, creado_en) VALUES ($1, $2, $3, NOW())',
+      'INSERT INTO entrevistadores (nombre, correo, password, creado_en) VALUES ($1, $2, $3, NOW())',
       [nombre, email, hashedPassword]
     );
 
@@ -45,9 +45,9 @@ const login = async (req, res) => {
   }
 
   try {
-    // 🔍 Buscar entrevistador por correo
+    // Buscar entrevistador por correo
     const result = await db.query(
-      'SELECT id, nombre, password FROM entrevistadores WHERE email = $1',
+      'SELECT id, nombre, password FROM entrevistadores WHERE correo = $1',
       [email]
     );
 
@@ -57,7 +57,7 @@ const login = async (req, res) => {
 
     const entrevistador = result.rows[0];
 
-    // 🔐 Comparar contraseñas
+    // Comparar contraseñas
     const esCorrecta = await bcrypt.compare(password, entrevistador.password);
 
     if (!esCorrecta) {
