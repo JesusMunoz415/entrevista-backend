@@ -5,28 +5,46 @@ require('dotenv').config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// ✅ CORS configurado para producción y desarrollo
+// 🌎 CORS configuración
 const allowedOrigins = [
-  'https://entrevista-frontend.onrender.com', // frontend en Render
-  'http://localhost:3000',                    // frontend local
+  'https://entrevista-frontend.onrender.com', // frontend en producción
+  'http://localhost:3000'                     // para pruebas locales
 ];
 
 app.use(cors({
-  origin: allowedOrigins,
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
 }));
 
+// 🌐 Manejo explícito de preflight (evita CORS error con OPTIONS)
+app.options('*', cors());
+
+// 📦 Middleware para parsear JSON
 app.use(express.json());
 
-// 📦 Importar rutas
-app.use('/api/auth', require('./routes/authRoutes'));
-app.use('/api/postulantes', require('./routes/crearPostulanteRoutes'));
-app.use('/api/guardar-respuesta', require('./routes/guardarRespuestaRoutes'));
-app.use('/api/historial', require('./routes/historialEntrevistasRoutes'));
-app.use('/api/eliminar-entrevista', require('./routes/eliminarEntrevistaRoutes'));
+// 📁 Importar rutas
+const authRoutes = require('./routes/authRoutes');
+const crearPostulanteRoutes = require('./routes/crearPostulanteRoutes');
+const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
+const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
+const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
-// 🏠 Ruta raíz
+// 🔗 Usar rutas
+app.use('/api/auth', authRoutes);
+app.use('/api/postulantes', crearPostulanteRoutes);
+app.use('/api/guardar-respuesta', guardarRespuestaRoutes);
+app.use('/api/historial', historialEntrevistasRoutes);
+app.use('/api/eliminar-entrevista', eliminarEntrevistaRoutes);
+
+// 📄 Ruta raíz
 app.get('/', (req, res) => {
   res.send('🎉 Backend conectado a Railway PostgreSQL y funcionando');
 });
