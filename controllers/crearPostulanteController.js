@@ -30,4 +30,22 @@ const crearPostulante = async (req, res) => {
   }
 };
 
-module.exports = crearPostulante;
+// 🚀 Bloque agregado para listar postulantes
+const listarPostulantes = async (req, res) => {
+  try {
+    const result = await db.query(`
+      SELECT id, nombre, creado_en, correo, telefono
+      FROM postulantes
+      ORDER BY creado_en DESC
+    `);
+
+    res.status(200).json(result.rows);
+  } catch (err) {
+    console.error('❌ Error al listar postulantes:', err);
+    return res.status(500).json({
+      status: 'error',
+      mensaje: 'Error al obtener la lista de postulantes.'
+    });
+  }
+};
+module.exports = { crearPostulante, listarPostulantes };
