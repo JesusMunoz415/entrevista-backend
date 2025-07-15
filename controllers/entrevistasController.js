@@ -18,7 +18,8 @@ const crearEntrevista = async (req, res) => {
     );
 
     const { token } = result.rows[0];
-    const enlace = `https://tu-frontend.onrender.com/entrevista/${token}`;
+    const enlace = `https://entrevista-frontend.onrender.com/entrevista/${token}`;
+
 
     res.status(201).json({
       status: 'ok',
