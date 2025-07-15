@@ -20,7 +20,6 @@ const crearEntrevista = async (req, res) => {
     const { token } = result.rows[0];
     const enlace = `https://entrevista-frontend.onrender.com/entrevista/${token}`;
 
-
     res.status(201).json({
       status: 'ok',
       mensaje: 'Entrevista creada exitosamente',
@@ -79,4 +78,8 @@ const actualizarEstadoEntrevista = async (req, res) => {
   }
 };
 
-module.exports = { crearEntrevista, obtenerEntrevistaPorToken, actualizarEstadoEntrevista };
+module.exports = {
+  crearEntrevista,
+  obtenerEntrevistaPorToken,
+  actualizarEstadoEntrevista
+};
