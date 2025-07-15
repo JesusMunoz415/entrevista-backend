@@ -1,6 +1,7 @@
 // backend/controllers/entrevistasController.js
 const db = require('../db');
 
+// ✅ Crear nueva entrevista
 const crearEntrevista = async (req, res) => {
   const { entrevistador_id, postulante_id, fecha } = req.body;
 
@@ -30,6 +31,7 @@ const crearEntrevista = async (req, res) => {
   }
 };
 
+// ✅ Obtener entrevista por token
 const obtenerEntrevistaPorToken = async (req, res) => {
   const { token } = req.params;
 
@@ -50,4 +52,30 @@ const obtenerEntrevistaPorToken = async (req, res) => {
   }
 };
 
-module.exports = { crearEntrevista, obtenerEntrevistaPorToken };
+// ✅ Actualizar estado de entrevista
+const actualizarEstadoEntrevista = async (req, res) => {
+  const { token } = req.params;
+  const { estado } = req.body;
+
+  if (!estado) {
+    return res.status(400).json({ status: 'error', mensaje: 'El campo estado es obligatorio' });
+  }
+
+  try {
+    const result = await db.query(
+      `UPDATE entrevistas SET estado = $1 WHERE token = $2 RETURNING *`,
+      [estado, token]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ status: 'error', mensaje: 'Entrevista no encontrada' });
+    }
+
+    res.status(200).json({ status: 'ok', entrevista: result.rows[0] });
+  } catch (err) {
+    console.error('❌ Error al actualizar estado de entrevista:', err);
+    res.status(500).json({ status: 'error', mensaje: 'Error en el servidor' });
+  }
+};
+
+module.exports = { crearEntrevista, obtenerEntrevistaPorToken, actualizarEstadoEntrevista };
