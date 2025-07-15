@@ -1,3 +1,5 @@
+//backend/controllers/authController.js
+
 const bcrypt = require('bcrypt');
 const db = require('../db'); // Conexión a PostgreSQL
 
