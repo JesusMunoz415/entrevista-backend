@@ -22,6 +22,10 @@ const guardarRespuestaRoutes = require('./routes/guardarRespuestaRoutes');
 const historialEntrevistasRoutes = require('./routes/historialEntrevistasRoutes');
 const eliminarEntrevistaRoutes = require('./routes/eliminarEntrevistaRoutes');
 
+
+const entrevistasRoutes = require('./routes/entrevistasRoutes');
+app.use('/api/entrevistas', entrevistasRoutes);
+
 // Usar rutas
 app.use('/api/auth', authRoutes);
 app.use('/api/postulantes', crearPostulanteRoutes);
