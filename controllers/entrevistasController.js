@@ -13,17 +13,18 @@ const crearEntrevista = async (req, res) => {
     const result = await db.query(
       `INSERT INTO entrevistas (entrevistador_id, postulante_id, fecha)
        VALUES ($1, $2, $3)
-       RETURNING id, token`,
+       RETURNING id`,
       [entrevistador_id, postulante_id, fecha]
     );
 
-    const { token } = result.rows[0];
-    const enlace = `https://entrevista-frontend.onrender.com/entrevista/${token}`;
+    const entrevistaId = result.rows[0].id;
+    const enlace = `https://entrevista-frontend.onrender.com/entrevista/${entrevistaId}`;
 
     res.status(201).json({
       status: 'ok',
       mensaje: 'Entrevista creada exitosamente',
-      enlace
+      enlace,
+      entrevista_id: entrevistaId
     });
   } catch (err) {
     console.error('❌ Error al crear entrevista:', err);
@@ -31,14 +32,14 @@ const crearEntrevista = async (req, res) => {
   }
 };
 
-// ✅ Obtener entrevista por token
-const obtenerEntrevistaPorToken = async (req, res) => {
-  const { token } = req.params;
+// ✅ Obtener entrevista por ID
+const obtenerEntrevistaPorId = async (req, res) => {
+  const { id } = req.params;
 
   try {
     const result = await db.query(
-      `SELECT * FROM entrevistas WHERE token = $1`,
-      [token]
+      `SELECT * FROM entrevistas WHERE id = $1`,
+      [id]
     );
 
     if (result.rows.length === 0) {
@@ -52,9 +53,9 @@ const obtenerEntrevistaPorToken = async (req, res) => {
   }
 };
 
-// ✅ Actualizar estado de entrevista
+// ✅ Actualizar estado de entrevista por ID
 const actualizarEstadoEntrevista = async (req, res) => {
-  const { token } = req.params;
+  const { id } = req.params;
   const { estado } = req.body;
 
   if (!estado) {
@@ -63,8 +64,8 @@ const actualizarEstadoEntrevista = async (req, res) => {
 
   try {
     const result = await db.query(
-      `UPDATE entrevistas SET estado = $1 WHERE token = $2 RETURNING *`,
-      [estado, token]
+      `UPDATE entrevistas SET estado = $1 WHERE id = $2 RETURNING *`,
+      [estado, id]
     );
 
     if (result.rows.length === 0) {
@@ -80,6 +81,6 @@ const actualizarEstadoEntrevista = async (req, res) => {
 
 module.exports = {
   crearEntrevista,
-  obtenerEntrevistaPorToken,
+  obtenerEntrevistaPorId,
   actualizarEstadoEntrevista
 };
