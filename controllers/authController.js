@@ -13,7 +13,7 @@ const register = async (req, res) => {
   try {
     // Verificar si ya existe
     const result = await db.query(
-      'SELECT id FROM public.entrevistadores WHERE correo = $1',
+      'SELECT id FROM public.entrevistadores WHERE email = $1',
       [email]
     );
 
@@ -47,7 +47,7 @@ const login = async (req, res) => {
 
   try {
     const result = await db.query(
-      'SELECT id, nombre, password FROM public.entrevistadores WHERE correo = $1',
+      'SELECT id, nombre, password FROM public.entrevistadores WHERE email = $1',
       [email]
     );
 
