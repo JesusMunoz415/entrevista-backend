@@ -26,7 +26,7 @@ const register = async (req, res) => {
 
     // Insertar nuevo entrevistador
     await db.query(
-      'INSERT INTO public.entrevistadores (nombre, correo, password, creado_en) VALUES ($1, $2, $3, NOW())',
+      'INSERT INTO public.entrevistadores (nombre, email, password, creado_en) VALUES ($1, $2, $3, NOW())',
       [nombre, email, hashedPassword]
     );
 
@@ -69,9 +69,12 @@ const login = async (req, res) => {
       nombre: entrevistador.nombre,
     });
   } catch (err) {
-    console.error('❌ Error en login:', err);
-    return res.status(500).json({ mensaje: 'Error en el servidor (login)' });
-  }
+  console.error('❌ Error en register:', err);
+  return res.status(500).json({ 
+    mensaje: 'Error en el servidor (register)', 
+    error: err.message // ✅ Esto muestra la causa real
+  });
+}
 };
 
 module.exports = { register, login };
