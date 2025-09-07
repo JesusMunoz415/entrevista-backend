@@ -1,14 +1,16 @@
 // controllers/crearPostulanteController.js
 const db = require('../db');
 
+// ✅ Crear postulante
 const crearPostulante = async (req, res) => {
-  const { nombre, correo = '', telefono = '' } = req.body;
+  const { nombre, correo = null, telefono = null } = req.body; // 🔹 Cambio: usar null en lugar de '' para evitar conflicto con UNIQUE
 
   if (!nombre) {
     return res.status(400).json({ status: 'error', mensaje: 'El nombre es obligatorio.' });
   }
 
   try {
+    // 🔹 Inserción del postulante
     const query = `
       INSERT INTO postulantes (nombre, correo, telefono)
       VALUES ($1, $2, $3)
@@ -16,9 +18,11 @@ const crearPostulante = async (req, res) => {
     `;
     const result = await db.query(query, [nombre, correo, telefono]);
 
+    const postulanteId = result.rows[0].id;
+
     res.json({
       status: 'ok',
-      id: result.rows[0].id, // 📦 devuelve el nuevo ID
+      id: postulanteId, // 📦 devuelve el nuevo ID
       nombre
     });
   } catch (err) {
@@ -30,7 +34,7 @@ const crearPostulante = async (req, res) => {
   }
 };
 
-// 🚀 Bloque agregado para listar postulantes
+// 🚀 Listar postulantes
 const listarPostulantes = async (req, res) => {
   try {
     const result = await db.query(`
@@ -48,4 +52,5 @@ const listarPostulantes = async (req, res) => {
     });
   }
 };
+
 module.exports = { crearPostulante, listarPostulantes };
